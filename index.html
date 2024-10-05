@@ -1,0 +1,156 @@
+<html></html>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <style>
+        .centerImage{
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        body {
+            background-image: url('https://cdn.pixabay.com/photo/2024/01/29/22/47/ai-generated-8540921_1280.jpg');
+            background-size: cover;
+        }
+    
+    </style>
+</head>
+<body class="bg-gray-900 h-screen flex justify-center items-center">
+    <div class="w-full h-5/6 max-w-md mx-auto p-4 bg-white rounded-lg shadow-2xl flex flex-col">
+        <!-- Chatbot Title -->
+        <div class="text-center text-3xl font-bold text-gray-700 mb-4"><img src="std.png" 
+            class="centerImage"
+            width="100px"
+            height="100px"
+            ></div>
+        <div id="chat-container" class="overflow-y-auto flex-grow p-4 bg-gray-100 rounded-lg shadow-inner">
+            <!-- Initial bot message -->
+            <div class="flex items-start space-x-2 mb-4">
+                <div class="bg-gray-200 rounded-full p-2">
+                    <div class="bg-green-500 w-3 h-3 rounded-full"></div>
+                </div>
+                <div class="bg-gray-200 rounded-lg p-2">
+                    <p>hey how can I help you ?</p>
+                </div>
+            </div>
+        </div>
+        <!-- Message input box -->
+        <div class="flex items-center space-x-2 mt-4">
+            <input id="user-input" type="text" class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your message...">
+            <button id="send-button" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        const botResponses = {
+            "default": `
+                <div class="flex items-start space-x-2 mb-4">
+                    <div class="bg-gray-200 rounded-full p-2">
+                        <div class="bg-green-500 w-3 h-3 rounded-full"></div>
+                    </div>
+                    <div class="bg-gray-200 rounded-lg p-2">
+                        <p>I'm sorry, I don't understand that.</p>
+                    </div>
+                </div>
+            `,
+            "diagnosis": `
+                <div class="flex justify-center mb-4">
+                    <div class="bg-black text-white rounded-lg p-4 text-center shadow-lg">
+                        <p class="mb-2">CLICK HERE TO START AR FUNCTION</p>
+                        <button onclick="window.location.href='https://app.roboflow.com/yoga-llbbb/yoga-yetxs/visualize/1?webcam=true'" class="bg-grey text-white font-bold py-2 px-4 rounded hover:bg-gray-200 transition duration-300">START</button>
+                    </div>
+                </div>
+                <div class="bg-gray-200 rounded-lg p-4 mb-4 shadow-lg">
+                    <p class="mb-2"><strong>Diagnostics Results:</strong></p>
+                    <div class="bg-white rounded-lg p-4 mb-2 shadow-md">
+                        <p>Electrolyte fluid has to be changed</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 mb-2 shadow-md">
+                        <p>Product link:</p>
+                        <p class="text-blue-500"><i class="fas fa-link"></i> https://amzn.in/d/0FBVa4e</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 mb-2 shadow-md">
+                        <p>Product warranty status: unclaimed</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 mb-2 shadow-md">
+                        <p>Expected service charges: 500 Rs</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 mb-2 shadow-md">
+                        <p>For more information, watch this video:</p>
+                        <p class="text-blue-500"><i class="fab fa-youtube"></i> <a href="https://youtu.be/5Lc8thL3zKQ?si=CG2qniw5HPliCXJK&t=1m15s" target="_blank">YouTube Video</a></p>
+                    </div>
+                </div>
+                <div class="bg-gray-200 rounded-lg p-4 mb-4 shadow-lg">
+                    <p class="mb-2"><strong>FAQs:</strong></p>
+                    <div class="bg-white rounded-lg p-4 mb-2 shadow-md">
+                        <p>Q: How do I initiate the AR function?</p>
+                        <p>A: Click on the "START" button above to initiate the AR function.</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 mb-2 shadow-md">
+                        <p>Q: Where can I find the product link?</p>
+                        <p>A: The product link is provided above in the diagnostics results section.</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 mb-2 shadow-md">
+                        <p>Q: What is the warranty status of my product?</p>
+                        <p>A: The product warranty status is unclaimed as mentioned above.</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 mb-2 shadow-md">
+                        <p>Q: How much are the expected service charges?</p>
+                        <p>A: The expected service charges are 500 Rs as mentioned above.</p>
+                    </div>
+                </div>
+            `,
+            "greeting": `
+                <div class="flex items-start space-x-2 mb-4">
+                    <div class="bg-gray-200 rounded-full p-2">
+                        <div class="bg-green-500 w-3 h-3 rounded-full"></div>
+                    </div>
+                    <div class="bg-gray-200 rounded-lg p-2">
+                        <p>Hello! How can I assist you today?</p>
+                    </div>
+                </div>
+            `
+        };
+
+        sendButton.addEventListener('click', () => {
+            const userMessage = userInput.value.trim();
+            if (userMessage) {
+                const userMessageHtml = `
+                    <div class="flex justify-end items-start space-x-2 mb-4">
+                        <div class="bg-blue-500 text-white rounded-lg p-2 shadow-lg">
+                            <p>${userMessage}</p>
+                        </div>
+                    </div>
+                `;
+                chatContainer.innerHTML += userMessageHtml;
+
+                const keywords = ["diagnosis", "ups", "defect", "problem"];
+                const greetings = ["hey", "hi", "hello"];
+                const containsKeyword = keywords.some(keyword => userMessage.toLowerCase().includes(keyword));
+                const containsGreeting = greetings.some(greeting => userMessage.toLowerCase().includes(greeting));
+
+                if (containsKeyword) {
+                    chatContainer.innerHTML += botResponses["diagnosis"];
+                } else if (containsGreeting) {
+                    chatContainer.innerHTML += botResponses["greeting"];
+                } else {
+                    chatContainer.innerHTML += botResponses["default"];
+                }
+
+                userInput.value = '';
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        });
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+    </script>
+</body>
+</html>
